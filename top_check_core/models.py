@@ -6,6 +6,8 @@ class UserProfile(models.Model):
     user_id = models.BigIntegerField(unique=True, verbose_name="ID пользователя в Telegram")
     username = models.CharField(max_length=255, null=True, blank=True, verbose_name="Имя пользователя")
     phone_number = models.CharField(max_length=20, null=True, blank=True, verbose_name="Номер телефона")
+    registration_date = models.DateTimeField(auto_now_add=True, verbose_name="Дата регистрации игрока")
+    lvl = models.IntegerField(default=1, verbose_name="Уровень игрока")
 
     class Meta:
         verbose_name = "Пользователь"

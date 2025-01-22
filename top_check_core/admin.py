@@ -6,7 +6,7 @@ from top_check_core.models import UserProfile, Referral
 @admin.register(UserProfile)
 class UserProfileAdmin(admin.ModelAdmin):
     """Регистрация в админ панели модели UserProfile."""
-    list_display = ['id', 'user_id', 'username', 'phone_number']
+    list_display = ['id', 'user_id', 'username', 'phone_number', 'registration_date', 'lvl']
 
 
 @admin.register(Referral)
