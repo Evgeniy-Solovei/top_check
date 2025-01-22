@@ -1,5 +1,4 @@
 from urllib.parse import quote, unquote
-
 from aiogram import Router, types
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram_bot.keyboard.advancement_keyboard import promotion_keyboard
@@ -53,9 +52,11 @@ async def handle_referral_link(message: types.Message):
     )
 
     # Создаем inline-кнопку "Поделиться ссылкой"
+    text = "Присоединяйся к TOP-CHECK! 🎁"
+    encoded_text = quote(text)
     share_button = InlineKeyboardButton(
         text="Поделиться ссылкой",
-        url=f"https://t.me/share/url?url={referral_link}&text=Присоединяйся к TOP-CHECK!"
+        url=f"https://t.me/share/url?url={referral_link}&text={encoded_text}"
     )
 
     # Создаем клавиатуру с кнопкой
