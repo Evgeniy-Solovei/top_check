@@ -23,9 +23,12 @@ frozenlist==1.5.0
 git-filter-repo==2.47.0
 h11==0.14.0
 idna==3.10
+iniconfig==2.0.0
 kombu==5.4.2
 magic-filter==1.0.12
 multidict==6.1.0
+packaging==24.2
+pluggy==1.5.0
 prompt_toolkit==3.0.48
 propcache==0.2.1
 psycopg2==2.9.10
