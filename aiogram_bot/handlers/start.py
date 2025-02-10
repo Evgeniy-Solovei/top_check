@@ -3,6 +3,7 @@ from aiogram.filters import Command, CommandStart
 from aiogram_bot.keyboard.phone_keyboard import get_share_phone_keyboard
 from aiogram_bot.keyboard.start_keyboard import get_main_keyboard
 from top_check_core.models import UserProfile, Referral
+from top_check_core.views import create_matrix, add_user_to_matrix
 
 router = Router()
 
@@ -32,12 +33,15 @@ async def handle_start(message: types.Message):
             await message.answer("Неверный реферальный код.")
             return  # Важно: завершаем выполнение функции
         # Получаем или создаем профиль пользователя
-        user_profile, created = await UserProfile.objects.aget_or_create(
-            user_id=user_id, username=username)
+        user_profile, created = await UserProfile.objects.aget_or_create(user_id=user_id, username=username)
         # Если пользователь только что создан (created = True), то добавляем реферера
         if created:
             # Создаем запись в Referral
             await Referral.objects.acreate(referrer=referrer, referred_user=user_profile)
+            # Создаем матрицы для нового пользователя
+            await create_matrix(user_profile)
+            # Добавляем пользователя во все матрицы рефереров вверх по дереву
+            await add_user_to_matrix(user_profile, referrer)
             # Формируем имя пригласившего
             referrer_name = f"@{referrer.username}" if referrer.username else f"пользователь с ID {referrer.user_id}"
             welcome_message = (
@@ -64,3 +68,35 @@ async def handle_start(message: types.Message):
             await message.answer(
                 "Для начала работы с ботом используйте реферальную ссылку.",
                 reply_markup=await get_main_keyboard())
+
+
+async def test_referral_system(referrer_id: int, referred_id: int):
+    """
+    Функция для тестирования реферальной системы.
+    """
+    # Создаём или получаем реферера
+    referrer, _ = await UserProfile.objects.aget_or_create(
+        user_id=referrer_id,
+        defaults={'username': f"user_{referrer_id}"}
+    )
+
+    # Создаём или получаем приглашённого пользователя
+    new_user, created = await UserProfile.objects.aget_or_create(
+        user_id=referred_id,
+        defaults={'username': f"user_{referred_id}"}
+    )
+
+    if not created:
+        print(f"Пользователь {referred_id} уже существует")
+        return
+
+    # Создаём реферальную связь
+    await Referral.objects.acreate(referrer=referrer, referred_user=new_user)
+
+    # Создаём матрицу для нового пользователя
+    await create_matrix(new_user)
+
+    # Добавляем в матрицу реферера
+    await add_user_to_matrix(new_user, referrer)
+
+    print(f"Пользователь {referred_id} успешно добавлен!")
